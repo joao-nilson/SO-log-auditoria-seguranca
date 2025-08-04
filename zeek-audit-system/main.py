@@ -11,6 +11,13 @@ import pandas as pd
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ALERT_RULES_PATH = os.path.join(BASE_DIR, "config", "alert_rules.yml")
+
+# Novo bloco de código para exibir o diretório de trabalho e verificar a existência do arquivo de configuração
+print("Diretório de trabalho atual:", os.getcwd())
+print("Existe config/alert_rules.yml?", os.path.exists(ALERT_RULES_PATH))
+
 def main():
     INTERFACE_REDE = os.getenv("INTERFACE_REDE", "eth0")
     DIRETORIO_LOGS = os.getenv("DIRETORIO_LOGS", "./logs")
@@ -53,7 +60,7 @@ def main():
         varreduras = analisador.detectar_varredura_portas(conexoes)
 
         # 4. Alertas
-        alert_manager = BatchAlertManager(DB_LOCAL)
+        alert_manager = BatchAlertManager(DB_LOCAL, config_path=ALERT_RULES_PATH)
         alert_manager.run_detections()
 
         # 5. Armazenar (sempre no banco local)

@@ -146,16 +146,16 @@ class BatchAlertManager:
         # Query to find source IPs scanning multiple ports in a time window
         query = f"""
         SELECT 
-            `id.orig_h` AS source_ip,
-            COUNT(DISTINCT `id.resp_p`) AS port_count,
+            id_orig_h AS source_ip,
+            COUNT(DISTINCT id_resp_p) AS port_count,
             MIN(ts) AS first_scan,
             MAX(ts) AS last_scan
         FROM {log_type}
         WHERE 
             ts BETWEEN ? AND ?
-            AND `id.resp_p` IS NOT NULL
-            AND `id.orig_h` NOT IN ({self._format_exclusions(rule.get('exclude_ips', []))})
-        GROUP BY `id.orig_h`, CAST(ts / {bucket_size} AS INTEGER)
+            AND `id_resp_p` IS NOT NULL
+            AND `id_orig_h` NOT IN ({self._format_exclusions(rule.get('exclude_ips', []))})
+        GROUP BY id_orig_h, CAST(ts / {bucket_size} AS INTEGER)
         HAVING port_count > ?
         """
         
@@ -196,7 +196,7 @@ class BatchAlertManager:
         WHERE 
             duration > ?
             AND ts BETWEEN ? AND ?
-            AND `id.orig_h` NOT IN ({self._format_exclusions(rule.get('exclude_ips', []))})
+            AND `id_orig_h` NOT IN ({self._format_exclusions(rule.get('exclude_ips', []))})
         """
         
         params = [duration_threshold, start_ts, end_ts]
@@ -229,9 +229,9 @@ class BatchAlertManager:
         SELECT *
         FROM {log_type}
         WHERE 
-            `id.resp_p` NOT IN ({','.join(['?']*len(common_ports))})
+            `id_resp_p` NOT IN ({','.join(['?']*len(common_ports))})
             AND ts BETWEEN ? AND ?
-            AND `id.orig_h` NOT IN ({self._format_exclusions(exclude_ips)})
+            AND `id_orig_h` NOT IN ({self._format_exclusions(exclude_ips)})
         """
         
         params = [*common_ports, start_ts, end_ts]
@@ -262,7 +262,7 @@ class BatchAlertManager:
         
         query = f"""
         SELECT 
-            `id.orig_h` AS source_ip,
+            `id_orig_h` AS source_ip,
             query,
             LENGTH(query) AS query_length,
             COUNT(*) AS request_count
@@ -270,7 +270,7 @@ class BatchAlertManager:
         WHERE 
             ts BETWEEN ? AND ?
             AND LENGTH(query) > ?
-        GROUP BY `id.orig_h`, query
+        GROUP BY `id_orig_h`, query
         HAVING request_count > 1 OR (LENGTH(query) - LENGTH(REPLACE(query, '.', ''))) > ?
         """
         
@@ -339,9 +339,9 @@ class BatchAlertManager:
                 timestamp_dt = datetime.now()
             
             # Extract relevant fields
-            source_ip = event_data.get('id.orig_h') or event_data.get('source_ip')
-            dest_ip = event_data.get('id.resp_h')
-            port = event_data.get('id.resp_p')
+            source_ip = event_data.get('id_orig_h') or event_data.get('source_ip')
+            dest_ip = event_data.get('id_resp_h')
+            port = event_data.get('id_resp_p')
             protocol = event_data.get('proto')
             
             return SecurityAlert(
@@ -386,15 +386,15 @@ class BatchAlertManager:
         elif alert_type == 'long_connection':
             return (
                 f"Long connection ({event_data.get('duration', 0):.2f}s) between "
-                f"{event_data.get('id.orig_h', 'unknown')} and "
-                f"{event_data.get('id.resp_h', 'unknown')} "
-                f"on port {event_data.get('id.resp_p', 'unknown')}"
+                f"{event_data.get('id_orig_h', 'unknown')} and "
+                f"{event_data.get('id_resp_h', 'unknown')} "
+                f"on port {event_data.get('id_resp_p', 'unknown')}"
             )
         elif alert_type == 'unusual_port':
             return (
-                f"Connection to unusual port {event_data.get('id.resp_p', 'unknown')} "
-                f"from {event_data.get('id.orig_h', 'unknown')} "
-                f"to {event_data.get('id.resp_h', 'unknown')}"
+                f"Connection to unusual port {event_data.get('id_resp_p', 'unknown')} "
+                f"from {event_data.get('id_orig_h', 'unknown')} "
+                f"to {event_data.get('id_resp_h', 'unknown')}"
             )
         elif alert_type == 'dns_tunneling':
             return (
