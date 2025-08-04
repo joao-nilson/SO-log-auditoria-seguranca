@@ -29,7 +29,8 @@ class ProcessadorLogsSeguranca:
 
     def _carregar_com_sqlite(self, tipo_log, filtros):
         if tipo_log not in self.tipos_logs:
-            raise ValueError(f"Tipo de log {tipo_log} não encontrado no DB ({self.tipos_logs})")
+            print(f"[Processor] Tipo de log {tipo_log} não encontrado no DB ({self.tipos_logs})")
+            return pd.DataFrame()
         try:
             conn = sqlite3.connect(self.caminho_db)
             query = f"SELECT * FROM {tipo_log}"
@@ -50,7 +51,7 @@ class ProcessadorLogsSeguranca:
             # conversão simples de timestamps
             for col in df.columns:
                 if col.startswith("ts") and pd.api.types.is_numeric_dtype(df[col]):
-                    df[col] = pd.to_datetime(df[col], unit="s")
+                    df[col] = pd.to_datetime(df[col], unit="s", errors="coerce")
             return df
         except Exception as e:
             print(f"[Processor] Erro ao carregar logs SQLite: {e}")

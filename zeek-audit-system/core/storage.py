@@ -6,6 +6,9 @@ class GerenciadorArmazenamento:
         self.engine = create_engine(conexao_db)
 
     def salvar_logs_processados(self, df, tabela, if_exists='append'):
+        if df is None or df.empty:
+            print("Nenhum dado para salvar.")
+            return
         try:
             df.to_sql(tabela, self.engine, if_exists=if_exists, index=False)
             print(f"Dados salvos com sucesso na tabela {tabela}")

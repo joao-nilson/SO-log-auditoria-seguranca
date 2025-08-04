@@ -3,12 +3,9 @@ import pandas as pd
 class AnalisadorSeguranca:
     @staticmethod
     def detectar_anomalias(df_conexoes: pd.DataFrame) -> pd.DataFrame:
-        """
-        Detecta conexões anômalas e retorna DataFrame padronizado com tipo e dados.
-        """
         alertas = []
 
-        if df_conexoes.empty:
+        if df_conexoes is None or df_conexoes.empty:
             return pd.DataFrame()
 
         # 1. Alta frequência
@@ -53,8 +50,10 @@ class AnalisadorSeguranca:
 
     @staticmethod
     def detectar_varredura_portas(df_conexoes: pd.DataFrame) -> pd.DataFrame:
+        if df_conexoes is None or df_conexoes.empty:
+            return pd.DataFrame()
         varreduras = df_conexoes.groupby('id.orig_h')['id.resp_p'].nunique().reset_index()
         varreduras.columns = ['ip_origem', 'portas_unicas']
-        suspeitos = varreduras[varreduras['portas_unicas'] > 10]
+        suspeitos = varreduras[varreduras['portas_unicas'] > 10].copy()
         suspeitos['tipo'] = 'varredura_portas'
         return suspeitos

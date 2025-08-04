@@ -36,7 +36,7 @@ class SecurityAlert:
     status: str = 'open'  # 'open', 'investigating', 'resolved', 'false_positive'
 
 class BatchAlertManager:
-    def __init__(self, db_path: str, config_path: str = 'config/alert_rules.yaml'):
+    def __init__(self, db_path: str, config_path: str = 'config/alert_rules.yml'):
         """
         Initialize the Batch Alert Manager with database and configuration.
         
@@ -412,7 +412,7 @@ class BatchAlertManager:
 
     def close(self):
         """Close database connection"""
-        if self.db_conn:
+        if hasattr(self, 'db_conn') and self.db_conn:
             self.db_conn.close()
             logger.info("Database connection closed")
 

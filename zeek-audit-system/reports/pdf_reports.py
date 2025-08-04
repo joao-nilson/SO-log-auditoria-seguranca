@@ -2,9 +2,16 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 class GeradorRelatorios:
+    """
+    Classe para geração de relatórios e visualizações de conexões.
+    """
     @staticmethod
     def gerar_relatorio_conexoes(df_conexoes):
         """Gera visualizações para análise de conexões"""
+        if df_conexoes is None or df_conexoes.empty:
+            print("Nenhum dado de conexão disponível para relatório.")
+            return
+
         plt.figure(figsize=(15, 10))
         
         # Gráfico 1: Top IPs de origem
@@ -22,7 +29,7 @@ class GeradorRelatorios:
         plt.xlabel('Número de Conexões')
         
         # Gráfico 3: Conexões ao longo do tempo
-        if 'ts' in df_conexoes.columns:
+        if 'ts' in df_conexoes.columns and hasattr(df_conexoes['ts'], 'dt'):
             plt.subplot(2, 1, 2)
             df_conexoes['hora'] = df_conexoes['ts'].dt.floor('H')
             conexoes_por_hora = df_conexoes.groupby('hora').size()
