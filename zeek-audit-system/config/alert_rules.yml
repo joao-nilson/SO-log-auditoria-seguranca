@@ -1,12 +1,26 @@
 port_scan:
-  threshold: 10  
-  time_window: 60   
+  log_type: conn
+  threshold: 15       # Minimum distinct ports to trigger
+  time_window: 60     # Seconds for detection window
   severity: high
+  exclude_ips: 
+    - 192.168.1.100   # Internal scanner
+    - 10.0.0.5        # Monitoring system
 
-long_connections:
-  threshold: 3600 
+long_connection:
+  log_type: conn
+  threshold: 7200     # 2 hours in seconds
   severity: medium
+  exclude_ips: []
 
-unusual_ports:
-  whitelist: [80, 443, 22, 53, 3389]
+unusual_port:
+  log_type: conn
+  common_ports: [80, 443, 22, 53, 3389]
   severity: low
+
+
+dns_tunneling:
+  log_type: dns
+  query_length: 50    # Minimum query length
+  subdomain_threshold: 5  # Minimum subdomain levels
+  severity: medium
