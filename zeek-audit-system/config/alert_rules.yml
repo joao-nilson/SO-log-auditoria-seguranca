@@ -1,0 +1,12 @@
+port_scan:
+  threshold: 10  
+  time_window: 60   
+  severity: high
+
+long_connections:
+  threshold: 3600 
+  severity: medium
+
+unusual_ports:
+  whitelist: [80, 443, 22, 53, 3389]
+  severity: low

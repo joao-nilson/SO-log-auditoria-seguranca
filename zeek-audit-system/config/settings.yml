@@ -1,0 +1,7 @@
+zeek:
+  interface: # interface de conexão, ex: eth0
+  log_dir: /var/log/zeek
+  log_types: [conn, http, dns, ssh]
+
+database:
+  sqlite_path: #caminho para .db
