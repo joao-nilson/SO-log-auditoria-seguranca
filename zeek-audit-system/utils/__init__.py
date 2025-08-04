@@ -13,7 +13,7 @@ from .time_utils import (
     human_readable_duration
 )
 
-from .log_formatter import (
+from .log_formater import (
     format_connection_log,
     format_http_log,
     anonymize_ip

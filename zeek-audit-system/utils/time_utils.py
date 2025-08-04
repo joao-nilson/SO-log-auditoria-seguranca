@@ -3,33 +3,20 @@ Time conversion utilities for Zeek log processing.
 Handles conversion between Zeek timestamps and Python datetime objects.
 """
 
-from datetime import datetime, timedelta
-import pytz
+from datetime import datetime, timedelta, timezone
 
 def zeek_to_datetime(zeek_ts: float) -> datetime:
     """
     Convert Zeek timestamp (Unix epoch) to datetime object.
-    
-    Args:
-        zeek_ts: Zeek timestamp (seconds since Unix epoch)
-        
-    Returns:
-        Timezone-aware datetime object
     """
-    return datetime.fromtimestamp(zeek_ts, tz=pytz.UTC)
+    return datetime.fromtimestamp(zeek_ts, tz=timezone.utc)
 
 def datetime_to_zeek(dt: datetime) -> float:
     """
     Convert datetime object to Zeek timestamp.
-    
-    Args:
-        dt: Datetime object (naive or timezone-aware)
-        
-    Returns:
-        Seconds since Unix epoch as float
     """
     if dt.tzinfo is None:
-        dt = pytz.utc.localize(dt)
+        dt = dt.replace(tzinfo=timezone.utc)
     return dt.timestamp()
 
 def human_readable_duration(seconds: float) -> str:
