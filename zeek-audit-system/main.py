@@ -14,9 +14,6 @@ logger = logging.getLogger(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ALERT_RULES_PATH = os.path.join(BASE_DIR, "config", "alert_rules.yml")
 
-# Novo bloco de código para exibir o diretório de trabalho e verificar a existência do arquivo de configuração
-print("Diretório de trabalho atual:", os.getcwd())
-print("Existe config/alert_rules.yml?", os.path.exists(ALERT_RULES_PATH))
 
 def main():
     INTERFACE_REDE = os.getenv("INTERFACE_REDE", "eth0")
