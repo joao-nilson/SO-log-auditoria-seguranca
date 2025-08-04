@@ -1,53 +1,47 @@
-from core.collector import ZeekCollector
-from monitoring.realtime import RealTimeMonitor
-from core.processor import LogProcessor
-from core.analyzer import SecurityAnalyzer
+import os
+import logging
+from core.collector import iniciar_monitoramento_zeek
+from core.processor import ProcessadorLogsSeguranca
+from core.analyzer import AnalisadorSeguranca
+from core.storage import GerenciadorArmazenamento
+from core.alerts import BatchAlertManager
 
-#def main():
-    # Initialize components
-#    collector = ZeekCollector()
-#    processor = LogProcessor()
-#    analyzer = SecurityAnalyzer()
-    
-    # Start real-time monitoring
-#    rt_monitor = RealTimeMonitor()
-#    rt_monitor.start()
-    
-    # Batch processing loop
-#    while True:
-#        logs = processor.load_logs('conn')
-#        results = analyzer.detect_anomalies(logs)
-        # Generate reports and handle alerts
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def main():
-    # Configurações
-    INTERFACE_REDE = 'eth0'
-    DIRETORIO_LOGS = '/caminho/para/logs'
-    DB_CENTRAL = 'postgresql://user:password@localhost/auditoria_seguranca' #trocar isso para armazenar localmente
-    
-    # 1. Iniciar captura de logs (Zeek)
+    INTERFACE_REDE = os.getenv("INTERFACE_REDE", "eth0")
+    DIRETORIO_LOGS = os.getenv("DIRETORIO_LOGS", "./logs")
+    DB_LOCAL = f"{DIRETORIO_LOGS}/zeek.sqlite"
+    DB_CENTRAL = os.getenv("DB_CENTRAL", "sqlite:///auditoria_local.db")  # pode ser PostgreSQL via URL
+
+    # 1. Iniciar Zeek
     iniciar_monitoramento_zeek(INTERFACE_REDE, DIRETORIO_LOGS)
-    
-    # 2. Processar logs
-    processador = ProcessadorLogsSeguranca(f"{DIRETORIO_LOGS}/zeek.sqlite")
+
+    # 2. Processar
+    processador = ProcessadorLogsSeguranca(DB_LOCAL, use_pyzeek=False)
     conexoes = processador.carregar_logs('conn')
     
-    # 3. Analisar segurança
+    # 3. Analisar
     analisador = AnalisadorSeguranca()
     anomalias = analisador.detectar_anomalias(conexoes)
     varreduras = analisador.detectar_varredura_portas(conexoes)
-    
-    # 4. Armazenar resultados
-    armazenamento = GerenciadorArmazenamento(DB_CENTRAL) #todo: guardar logs localmente
-    armazenamento.salvar_logs_processados(conexoes, 'conexoes_network')
-    armazenamento.salvar_alertas(anomalias)
-    armazenamento.salvar_alertas(varreduras)
-    
-    # 5. Gerar relatórios
-    GeradorRelatorios.gerar_relatorio_conexoes(conexoes)
-    
-    print("Sistema de auditoria de segurança executado com sucesso!")
 
+    # 4. Alertas
+    alert_manager = BatchAlertManager(DB_LOCAL)
+    # Ex: alimentar o alert_manager com regras e executar detecções
+    alert_manager.run_detections()
+
+    # 5. Armazenar
+    armazenamento = GerenciadorArmazenamento(DB_CENTRAL)
+    if conexoes is not None:
+        armazenamento.salvar_logs_processados(conexoes, 'conexoes_network')
+    if not anomalias.empty:
+        armazenamento.salvar_alertas(anomalias)
+    if not varreduras.empty:
+        armazenamento.salvar_alertas(varreduras)
+
+    logger.info("Sistema de auditoria de segurança executado com sucesso!")
 
 if __name__ == "__main__":
     main()

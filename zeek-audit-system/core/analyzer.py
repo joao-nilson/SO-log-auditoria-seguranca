@@ -1,47 +1,60 @@
-from config import alert_rules
+import pandas as pd
 
 class AnalisadorSeguranca:
     @staticmethod
-    def detectar_anomalias(df_conexoes):
+    def detectar_anomalias(df_conexoes: pd.DataFrame) -> pd.DataFrame:
         """
-        Detecta conexões anômalas com base em limiares estatísticos
-        :return: DataFrame com conexões anômalas
+        Detecta conexões anômalas e retorna DataFrame padronizado com tipo e dados.
         """
-        anomalias = []
-        
-        # 1. Conexões com alta frequência
+        alertas = []
+
+        if df_conexoes.empty:
+            return pd.DataFrame()
+
+        # 1. Alta frequência
         freq_ips = df_conexoes['id.orig_h'].value_counts()
-        ips_suspeitos = freq_ips[freq_ips > freq_ips.quantile(0.99)].index
-        anomalias.extend(ips_suspeitos.tolist())
-        
+        limiar = freq_ips.quantile(0.99)
+        ips_suspeitos = freq_ips[freq_ips > limiar].index.tolist()
+        for ip in ips_suspeitos:
+            alertas.append({
+                "tipo": "alta_frequencia",
+                "id.orig_h": ip,
+                "descricao": f"IP com frequência alta: {ip}"
+            })
+
         # 2. Portas incomuns
         portas_comuns = [80, 443, 22, 53]
-        conexoes_portas_estranhas = df_conexoes[~df_conexoes['id.resp_p'].isin(portas_comuns)]
-        if not conexoes_portas_estranhas.empty:
-            anomalias.extend(conexoes_portas_estranhas.to_dict('records'))
-        
+        if 'id.resp_p' in df_conexoes.columns:
+            estranhas = df_conexoes[~df_conexoes['id.resp_p'].isin(portas_comuns)]
+            for _, row in estranhas.iterrows():
+                alertas.append({
+                    "tipo": "porta_incomum",
+                    "id.orig_h": row.get('id.orig_h'),
+                    "id.resp_p": row.get('id.resp_p'),
+                    "descricao": f"Conexão para porta incomum: {row.get('id.resp_p')}"
+                })
+
         # 3. Durações anormais
         if 'duration' in df_conexoes.columns:
             q1 = df_conexoes['duration'].quantile(0.25)
             q3 = df_conexoes['duration'].quantile(0.75)
             iqr = q3 - q1
-            limite = q3 + 3*iqr
-            duracoes_anormais = df_conexoes[df_conexoes['duration'] > limite]
-            if not duracoes_anormais.empty:
-                anomalias.extend(duracoes_anormais.to_dict('records'))
-        
-        return pd.DataFrame(anomalias)
-    
+            limite = q3 + 3 * iqr
+            anormais = df_conexoes[df_conexoes['duration'] > limite]
+            for _, row in anormais.iterrows():
+                alertas.append({
+                    "tipo": "duracao_anormal",
+                    "id.orig_h": row.get('id.orig_h'),
+                    "duration": row.get('duration'),
+                    "descricao": f"Duração anormal: {row.get('duration'):.2f}s"
+                })
+
+        return pd.DataFrame(alertas)
+
     @staticmethod
-    def detectar_varredura_portas(df_conexoes):
-        """
-        Detecta possíveis varreduras de portas
-        :return: DataFrame com IPs suspeitos
-        """
-        # Agrupar por IP origem e contar portas únicas acessadas
+    def detectar_varredura_portas(df_conexoes: pd.DataFrame) -> pd.DataFrame:
         varreduras = df_conexoes.groupby('id.orig_h')['id.resp_p'].nunique().reset_index()
         varreduras.columns = ['ip_origem', 'portas_unicas']
-        
-        # Considerar suspeito quem acessou mais de 10 portas diferentes
         suspeitos = varreduras[varreduras['portas_unicas'] > 10]
+        suspeitos['tipo'] = 'varredura_portas'
         return suspeitos
