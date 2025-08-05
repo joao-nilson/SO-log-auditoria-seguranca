@@ -27,12 +27,10 @@ def main():
     Path(DIRETORIO_LOGS).mkdir(parents=True, exist_ok=True)
 
     # Importa todos os logs do Zeek para o banco antes de processar
-
     armazenamento = GerenciadorArmazenamento(f"sqlite:///{DB_LOCAL}")
     arquivos_logs = glob.glob(os.path.join(DIRETORIO_LOGS, "*.log"))
     for arquivo in arquivos_logs:
         importar_log_zeek(arquivo, armazenamento)
-        print('oi')
 
     try:
         # 1. Iniciar Zeek
@@ -44,12 +42,12 @@ def main():
         if conexoes is None or conexoes.empty:
             logger.error("Nenhum dado de conexão encontrado na tabela 'conn'.")
             return
-        # Padroniza nomes das colunas para o formato esperado pelo analisador
+        # Padroniza nomes das colunas
         conexoes = conexoes.rename(columns={
-            'id_orig_h': 'id.orig_h',
-            'id_resp_h': 'id.resp_h',
-            'id_orig_p': 'id.orig_p',
-            'id_resp_p': 'id.resp_p'
+            'id_orig_h': 'id_orig_h',
+            'id_resp_h': 'id_resp_h',
+            'id_orig_p': 'id_orig_p',
+            'id_resp_p': 'id_resp_p'
         })
 
         # Converte colunas de tempo para float
@@ -59,8 +57,6 @@ def main():
 
         if 'ts' in conexoes.columns:
             conexoes['ts'] = pd.to_datetime(conexoes['ts'], unit='s', errors='coerce')
-
-        # logger.info(f"Colunas disponíveis em 'conn': {list(conexoes.columns)}")  # Removido para não exibir prints
 
         # 3. Analisar
         analisador = AnalisadorSeguranca()
