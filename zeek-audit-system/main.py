@@ -7,6 +7,7 @@ from core.processor import ProcessadorLogsSeguranca
 from core.analyzer import AnalisadorSeguranca
 from core.storage import GerenciadorArmazenamento
 from core.alerts import BatchAlertManager
+from utils.import_zeek import importar_zeek_conn_logs_para_db
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -18,7 +19,7 @@ CONFIG = {
     'logs_dir': BASE_DIR / "zeek_logs",
     'db_path': BASE_DIR / "zeek_data" / "output.db",
     'alert_rules': BASE_DIR / "config" / "alert_rules.yml",
-    'interface': os.getenv("INTERFACE_REDE", "wlp3s0")
+    'interface': os.getenv("INTERFACE_REDE", "enp0s3")
 }
 
 def _load_sample_data():
@@ -56,6 +57,12 @@ def main():
     )
 
         # 3. Load connection logs
+        importar_zeek_conn_logs_para_db(
+        str(CONFIG['logs_dir']),
+        str(CONFIG['db_path']),
+        tabela='conn'
+)
+
         conexoes = processor.carregar_logs('conn')
 
         conexoes = processor.carregar_logs('conn')
