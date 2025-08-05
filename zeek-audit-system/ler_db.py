@@ -14,11 +14,5 @@ cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
 tabelas = cursor.fetchall()
 print("Tabelas disponíveis:", tabelas)
 
-# Ler dados de uma tabela específica
-cursor.execute("SELECT * FROM dns LIMIT 10;")
-linhas = cursor.fetchall()
-for linha in linhas:
-    print(linha)
-
 # Fechar conexão
 conn.close()
