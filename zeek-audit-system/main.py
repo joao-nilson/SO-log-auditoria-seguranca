@@ -6,6 +6,9 @@ from core.processor import ProcessadorLogsSeguranca
 from core.analyzer import AnalisadorSeguranca
 from core.storage import GerenciadorArmazenamento
 from core.alerts import BatchAlertManager
+from utils.importa_zeek_logs import importar_log_zeek
+from core.storage import GerenciadorArmazenamento
+import glob
 import pandas as pd
 
 logging.basicConfig(level=logging.INFO)
@@ -16,12 +19,20 @@ ALERT_RULES_PATH = os.path.join(BASE_DIR, "config", "alert_rules.yml")
 
 
 def main():
-    INTERFACE_REDE = os.getenv("INTERFACE_REDE", "eth0")
+    INTERFACE_REDE = os.getenv("INTERFACE_REDE", "enp0s3")
     DIRETORIO_LOGS = os.getenv("DIRETORIO_LOGS", "./zeek_logs")
     DB_LOCAL = "/home/davi-monken/Documentos/SO/output.db"
 
     # Garante que o diretório de logs existe
     Path(DIRETORIO_LOGS).mkdir(parents=True, exist_ok=True)
+
+    # Importa todos os logs do Zeek para o banco antes de processar
+
+    armazenamento = GerenciadorArmazenamento(f"sqlite:///{DB_LOCAL}")
+    arquivos_logs = glob.glob(os.path.join(DIRETORIO_LOGS, "*.log"))
+    for arquivo in arquivos_logs:
+        importar_log_zeek(arquivo, armazenamento)
+        print('oi')
 
     try:
         # 1. Iniciar Zeek
