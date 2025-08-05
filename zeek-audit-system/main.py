@@ -17,7 +17,7 @@ ALERT_RULES_PATH = os.path.join(BASE_DIR, "config", "alert_rules.yml")
 
 def main():
     INTERFACE_REDE = os.getenv("INTERFACE_REDE", "eth0")
-    DIRETORIO_LOGS = os.getenv("DIRETORIO_LOGS", "./logs")
+    DIRETORIO_LOGS = os.getenv("DIRETORIO_LOGS", "./zeek_logs")
     DB_LOCAL = "/home/davi-monken/Documentos/SO/output.db"
 
     # Garante que o diretório de logs existe
