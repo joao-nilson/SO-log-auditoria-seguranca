@@ -10,7 +10,7 @@ class AnalisadorSeguranca:
 
         # 1. Alta frequência
         freq_ips = df_conexoes['id_orig_h'].value_counts()
-        limiar = freq_ips.quantile(0.99)
+        limiar = freq_ips.quantile(0.9)
         ips_suspeitos = freq_ips[freq_ips > limiar].index.tolist()
         for ip in ips_suspeitos:
             alertas.append({
@@ -36,7 +36,7 @@ class AnalisadorSeguranca:
             q1 = df_conexoes['duration'].quantile(0.25)
             q3 = df_conexoes['duration'].quantile(0.75)
             iqr = q3 - q1
-            limite = q3 + 3 * iqr
+            limite = q3 + 2 * iqr
             anormais = df_conexoes[df_conexoes['duration'] > limite]
             for _, row in anormais.iterrows():
                 alertas.append({
@@ -52,7 +52,7 @@ class AnalisadorSeguranca:
             q1 = df_conexoes['resp_pkts'].quantile(0.25)
             q3 = df_conexoes['resp_pkts'].quantile(0.75)
             iqr = q3 - q1
-            limite = q3 + 3 * iqr
+            limite = q3 + 2 * iqr
             anormais = df_conexoes[df_conexoes['resp_pkts'] > limite]
             for _, row in anormais.iterrows():
                 alertas.append({

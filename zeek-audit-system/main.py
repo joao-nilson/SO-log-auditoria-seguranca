@@ -10,6 +10,7 @@ from utils.importa_zeek_logs import importar_log_zeek
 from core.storage import GerenciadorArmazenamento
 import glob
 import pandas as pd
+import sqlite3
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -59,6 +60,13 @@ def main():
         if 'ts' in conexoes.columns:
             conexoes['ts'] = pd.to_datetime(conexoes['ts'], unit='s', errors='coerce')
 
+        # Adiciona a coluna 'duration' se não existir
+        try:
+            with sqlite3.connect(DB_LOCAL) as conn:
+                conn.execute("ALTER TABLE alertas_seguranca ADD COLUMN duration REAL;")
+        except sqlite3.OperationalError as e:
+            if "duplicate column name" not in str(e):
+                raise
         # 3. Analisar
         analisador = AnalisadorSeguranca()
         anomalias = analisador.detectar_anomalias(conexoes)
