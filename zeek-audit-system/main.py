@@ -21,7 +21,7 @@ ALERT_RULES_PATH = os.path.join(BASE_DIR, "config", "alert_rules.yml")
 def main():
     INTERFACE_REDE = os.getenv("INTERFACE_REDE", "enp0s3")
     DIRETORIO_LOGS = os.getenv("DIRETORIO_LOGS", "./zeek_logs")
-    DB_LOCAL = "/home/davi-monken/Documentos/SO/output.db"
+    DB_LOCAL = "output.db"
 
     # Garante que o diretório de logs existe
     Path(DIRETORIO_LOGS).mkdir(parents=True, exist_ok=True)
@@ -39,16 +39,17 @@ def main():
         # 2. Processar
         processador = ProcessadorLogsSeguranca(DB_LOCAL, use_pyzeek=False)
         conexoes = processador.carregar_logs('conn')
+        # print("Colunas do DataFrame:", conexoes.columns.tolist())
         if conexoes is None or conexoes.empty:
             logger.error("Nenhum dado de conexão encontrado na tabela 'conn'.")
             return
         # Padroniza nomes das colunas
-        conexoes = conexoes.rename(columns={
-            'id_orig_h': 'id_orig_h',
-            'id_resp_h': 'id_resp_h',
-            'id_orig_p': 'id_orig_p',
-            'id_resp_p': 'id_resp_p'
-        })
+        # conexoes = conexoes.rename(columns={
+        #     'id.orig_h': 'id_orig_h',
+        #     'id.resp_h': 'id_resp_h',
+        #     'id.orig_p': 'id_orig_p',
+        #     'id.resp_p': 'id_resp_p'
+        # })
 
         # Converte colunas de tempo para float
         for col in ['ts', 'duration']:

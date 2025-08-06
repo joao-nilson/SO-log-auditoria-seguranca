@@ -16,14 +16,14 @@ class GeradorRelatorios:
         
         # Gráfico 1: Top IPs de origem
         plt.subplot(2, 2, 1)
-        top_ips = df_conexoes['id.orig_h'].value_counts().head(10)
+        top_ips = df_conexoes['id_orig_h'].value_counts().head(10)
         sns.barplot(x=top_ips.values, y=top_ips.index)
         plt.title('Top 10 IPs de Origem')
         plt.xlabel('Número de Conexões')
         
         # Gráfico 2: Distribuição de portas
         plt.subplot(2, 2, 2)
-        top_portas = df_conexoes['id.resp_p'].value_counts().head(10)
+        top_portas = df_conexoes['id_resp_p'].value_counts().head(10)
         sns.barplot(x=top_portas.values, y=top_portas.index.astype(str))
         plt.title('Top 10 Portas de Destino')
         plt.xlabel('Número de Conexões')
