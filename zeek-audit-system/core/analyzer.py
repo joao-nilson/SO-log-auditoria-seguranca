@@ -46,6 +46,22 @@ class AnalisadorSeguranca:
                     "descricao": f"Duração anormal: {row.get('duration'):.2f}s"
                 })
 
+        # 4. Quantidade de pacotes anormal
+        if 'resp_pkts' in df_conexoes.columns:
+            df_conexoes['resp_pkts'] = pd.to_numeric(df_conexoes['resp_pkts'], errors='coerce')
+            q1 = df_conexoes['resp_pkts'].quantile(0.25)
+            q3 = df_conexoes['resp_pkts'].quantile(0.75)
+            iqr = q3 - q1
+            limite = q3 + 3 * iqr
+            anormais = df_conexoes[df_conexoes['resp_pkts'] > limite]
+            for _, row in anormais.iterrows():
+                alertas.append({
+                    "tipo": "resp_pkts_anormal",
+                    "id_orig_h": row.get('id_orig_h'),
+                    "resp_pkts": row.get('resp_pkts'),
+                    "descricao": f"Quantidade de pacotes anormal: {row.get('resp_pkts')}"
+                })
+
         return pd.DataFrame(alertas)
 
     @staticmethod
