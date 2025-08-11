@@ -3,7 +3,7 @@ Network-related utilities for Zeek log processing.
 Handles IP addresses, ports, and network analysis.
 """
 
-from ipaddress import ip_address, IPv4Address, IPv6Address
+from ipaddress import ip_address, ip_network, IPv4Address, IPv6Address
 import socket
 from typing import Union, Optional
 
@@ -94,16 +94,16 @@ def validate_ip_address(ip: str) -> bool:
 def cidr_contains_ip(cidr: str, ip: str) -> bool:
     """
     Check if IP address falls within a CIDR range.
-    
+
     Args:
         cidr: CIDR notation (e.g., '192.168.1.0/24')
         ip: IP address to check
-        
+
     Returns:
         True if IP is within CIDR range
     """
     try:
-        network = ip_address(cidr.split('/')[0])
+        network = ip_network(cidr, strict=False)
         ip_addr = ip_address(ip)
         return ip_addr in network
     except (ValueError, IndexError):

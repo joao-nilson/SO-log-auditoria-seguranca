@@ -1,0 +1,20 @@
+tipo,id_orig_h,descricao,id_resp_p,duration,data_deteccao
+alta_frequencia,10.0.2.15,IP com frequência alta: 10.0.2.15,,,2025-08-06 17:46:56.686611
+porta_incomum,fe80::ab4d:afa8:7f33:2cda,Conexão para porta incomum: 134,134,,2025-08-06 17:46:56.686611
+porta_incomum,10.0.2.15,Conexão para porta incomum: 443,443,,2025-08-06 17:46:56.686611
+porta_incomum,10.0.2.15,Conexão para porta incomum: 443,443,,2025-08-06 17:46:56.686611
+porta_incomum,10.0.2.15,Conexão para porta incomum: 443,443,,2025-08-06 17:46:56.686611
+porta_incomum,10.0.2.15,Conexão para porta incomum: 443,443,,2025-08-06 17:46:56.686611
+porta_incomum,10.0.2.15,Conexão para porta incomum: 443,443,,2025-08-06 17:46:56.686611
+porta_incomum,10.0.2.15,Conexão para porta incomum: 443,443,,2025-08-06 17:46:56.686611
+porta_incomum,10.0.2.15,Conexão para porta incomum: 443,443,,2025-08-06 17:46:56.686611
+porta_incomum,10.0.2.15,Conexão para porta incomum: 443,443,,2025-08-06 17:46:56.686611
+porta_incomum,10.0.2.15,Conexão para porta incomum: 443,443,,2025-08-06 17:46:56.686611
+porta_incomum,10.0.2.15,Conexão para porta incomum: 443,443,,2025-08-06 17:46:56.686611
+porta_incomum,10.0.2.15,Conexão para porta incomum: 443,443,,2025-08-06 17:46:56.686611
+porta_incomum,10.0.2.15,Conexão para porta incomum: 9100,9100,,2025-08-06 17:46:56.686611
+porta_incomum,10.0.2.15,Conexão para porta incomum: 9100,9100,,2025-08-06 17:46:56.686611
+porta_incomum,10.0.2.15,Conexão para porta incomum: 9100,9100,,2025-08-06 17:46:56.686611
+duracao_anormal,10.0.2.15,Duração anormal: 11655.08s,,11655.076905,2025-08-06 17:46:56.686611
+duracao_anormal,10.0.2.15,Duração anormal: 11673.88s,,11673.880521,2025-08-06 17:46:56.686611
+duracao_anormal,10.0.2.15,Duração anormal: 11803.09s,,11803.094382,2025-08-06 17:46:56.686611

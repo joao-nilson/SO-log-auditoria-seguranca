@@ -19,8 +19,8 @@ def format_connection_log(conn_log: dict) -> str:
     """
     return (
         f"Connection {conn_log.get('uid', 'N/A')}: "
-        f"{conn_log.get('id.orig_h', '?')}:{conn_log.get('id.orig_p', '?')} → "
-        f"{conn_log.get('id.resp_h', '?')}:{conn_log.get('id.resp_p', '?')} "
+        f"{conn_log.get('id_orig_h', '?')}:{conn_log.get('id_orig_p', '?')} → "
+        f"{conn_log.get('id_resp_h', '?')}:{conn_log.get('id_resp_p', '?')} "
         f"Proto: {conn_log.get('proto', 'N/A')} "
         f"Duration: {conn_log.get('duration', 0):.2f}s "
         f"Bytes: {conn_log.get('orig_bytes', 0)}/{conn_log.get('resp_bytes', 0)}"
